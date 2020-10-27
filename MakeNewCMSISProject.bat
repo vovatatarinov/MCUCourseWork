@@ -4,7 +4,7 @@
 @xcopy Templates\CMSISProjectTemplate\* Projects\%NewProjectName%\* /s /e
 
 @echo Set correct names.
-@for /R "Projects\%NewProjectName%" %%x in (Templates\CMSISProjectTemplate.*) do @ren %%x %NewProjectName%.*
+@for /R "Projects\%NewProjectName%" %%x in (CMSISProjectTemplate.*) do @ren %%x %NewProjectName%.*
 
 @echo Project %NewProjectName% created in Projects directory.
 @echo Add this project to existing IAR workspace manually.
