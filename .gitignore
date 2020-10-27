@@ -10,3 +10,9 @@
 *.dnx
 *.ps1
 *.bat
+*.reggroups
+*.o
+*.map
+*.sim
+*.out
+settings/STM32F429Workspace.wsdt
