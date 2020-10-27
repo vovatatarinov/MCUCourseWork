@@ -16,3 +16,4 @@
 *.sim
 *.out
 settings/STM32F429Workspace.wsdt
+*.crun
