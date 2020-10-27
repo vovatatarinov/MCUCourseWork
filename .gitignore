@@ -1,0 +1,12 @@
+*.ninja_deps
+*.ninja_log
+*.xcl
+*.dep
+*.pbi
+*.ninja
+*.pbw
+*.browse
+*.pbd
+*.dnx
+*.ps1
+*.bat
