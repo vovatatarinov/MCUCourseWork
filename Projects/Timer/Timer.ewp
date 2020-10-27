@@ -2120,6 +2120,12 @@
         <name>$PROJ_DIR$\startup_stm32f429xx.s</name>
     </file>
     <file>
+        <name>$PROJ_DIR$\..\..\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_ll_gpio.c</name>
+    </file>
+    <file>
+        <name>$PROJ_DIR$\..\..\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_ll_tim.c</name>
+    </file>
+    <file>
         <name>$PROJ_DIR$\system_stm32f4xx.c</name>
     </file>
 </project>

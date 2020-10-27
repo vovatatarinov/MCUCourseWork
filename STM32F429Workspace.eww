@@ -3,5 +3,8 @@
     <project>
         <path>$WS_DIR$\Projects\Blinky\Blinky.ewp</path>
     </project>
+    <project>
+        <path>$WS_DIR$\Projects\Timer\Timer.ewp</path>
+    </project>
     <batchBuild />
 </workspace>
