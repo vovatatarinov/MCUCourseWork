@@ -66,7 +66,7 @@
                 </option>
                 <option>
                     <name>OGLastSavedByProductVersion</name>
-                    <state>8.42.1.23869</state>
+                    <state>8.40.1.21529</state>
                 </option>
                 <option>
                     <name>GeneralEnableMisra</name>
@@ -116,7 +116,7 @@
                 </option>
                 <option>
                     <name>GBECoreSlave</name>
-                    <version>28</version>
+                    <version>27</version>
                     <state>39</state>
                 </option>
                 <option>
@@ -133,7 +133,7 @@
                 </option>
                 <option>
                     <name>CoreVariant</name>
-                    <version>28</version>
+                    <version>27</version>
                     <state>39</state>
                 </option>
                 <option>
@@ -156,7 +156,7 @@
                 </option>
                 <option>
                     <name>GFPUCoreSlave2</name>
-                    <version>28</version>
+                    <version>27</version>
                     <state>39</state>
                 </option>
                 <option>
@@ -215,13 +215,9 @@
             <name>ICCARM</name>
             <archiveVersion>2</archiveVersion>
             <data>
-                <version>36</version>
+                <version>35</version>
                 <wantNonLocal>1</wantNonLocal>
                 <debug>1</debug>
-                <option>
-                    <name>CCOptimizationNoSizeConstraints</name>
-                    <state>0</state>
-                </option>
                 <option>
                     <name>CCDefines</name>
                     <state>STM32F429xx</state>
@@ -237,7 +233,7 @@
                 </option>
                 <option>
                     <name>CCPreprocLine</name>
-                    <state>0</state>
+                    <state>1</state>
                 </option>
                 <option>
                     <name>CCListCFile</name>
@@ -429,6 +425,10 @@
                     <state>0</state>
                 </option>
                 <option>
+                    <name>CCOptimizationNoSizeConstraints</name>
+                    <state>0</state>
+                </option>
+                <option>
                     <name>CCNoLiteralPool</name>
                     <state>0</state>
                 </option>
@@ -468,10 +468,6 @@
                 <option>
                     <name>OICompilerExtraOption</name>
                     <state>1</state>
-                </option>
-                <option>
-                    <name>CCStackProtection</name>
-                    <state>0</state>
                 </option>
             </data>
         </settings>
@@ -1173,7 +1169,7 @@
                 </option>
                 <option>
                     <name>GBECoreSlave</name>
-                    <version>28</version>
+                    <version>27</version>
                     <state>38</state>
                 </option>
                 <option>
@@ -1190,7 +1186,7 @@
                 </option>
                 <option>
                     <name>CoreVariant</name>
-                    <version>28</version>
+                    <version>27</version>
                     <state>38</state>
                 </option>
                 <option>
@@ -1213,7 +1209,7 @@
                 </option>
                 <option>
                     <name>GFPUCoreSlave2</name>
-                    <version>28</version>
+                    <version>27</version>
                     <state>38</state>
                 </option>
                 <option>
@@ -1272,13 +1268,9 @@
             <name>ICCARM</name>
             <archiveVersion>2</archiveVersion>
             <data>
-                <version>36</version>
+                <version>35</version>
                 <wantNonLocal>1</wantNonLocal>
                 <debug>0</debug>
-                <option>
-                    <name>CCOptimizationNoSizeConstraints</name>
-                    <state>0</state>
-                </option>
                 <option>
                     <name>CCDefines</name>
                     <state>NDEBUG</state>
@@ -1293,7 +1285,7 @@
                 </option>
                 <option>
                     <name>CCPreprocLine</name>
-                    <state>0</state>
+                    <state>1</state>
                 </option>
                 <option>
                     <name>CCListCFile</name>
@@ -1431,7 +1423,7 @@
                 </option>
                 <option>
                     <name>CCOptLevelSlave</name>
-                    <state>3</state>
+                    <state>1</state>
                 </option>
                 <option>
                     <name>CompilerMisraRules98</name>
@@ -1484,6 +1476,10 @@
                     <state>0</state>
                 </option>
                 <option>
+                    <name>CCOptimizationNoSizeConstraints</name>
+                    <state>0</state>
+                </option>
+                <option>
                     <name>CCNoLiteralPool</name>
                     <state>0</state>
                 </option>
@@ -1523,10 +1519,6 @@
                 <option>
                     <name>OICompilerExtraOption</name>
                     <state>1</state>
-                </option>
-                <option>
-                    <name>CCStackProtection</name>
-                    <state>0</state>
                 </option>
             </data>
         </settings>
