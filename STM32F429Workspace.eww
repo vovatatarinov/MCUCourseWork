@@ -1,7 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <workspace>
     <project>
+        <path>$WS_DIR$\Projects\10_0\EWARM\10_0.ewp</path>
+    </project>
+    <project>
+        <path>$WS_DIR$\Projects\11_0\11_0.ewp</path>
+    </project>
+    <project>
+        <path>$WS_DIR$\Projects\1_0\1_0.ewp</path>
+    </project>
+    <project>
+        <path>$WS_DIR$\Projects\2_0\2_0.ewp</path>
+    </project>
+    <project>
+        <path>$WS_DIR$\Projects\2_1\2_1.ewp</path>
+    </project>
+    <project>
+        <path>$WS_DIR$\Projects\3_0\3_0.ewp</path>
+    </project>
+    <project>
+        <path>$WS_DIR$\Projects\3_1\3_1.ewp</path>
+    </project>
+    <project>
+        <path>$WS_DIR$\Projects\4_0\4_0.ewp</path>
+    </project>
+    <project>
+        <path>$WS_DIR$\Projects\5_0\5_0.ewp</path>
+    </project>
+    <project>
+        <path>$WS_DIR$\Projects\6_1\6_1.ewp</path>
+    </project>
+    <project>
+        <path>$WS_DIR$\Projects\7_0\7_0.ewp</path>
+    </project>
+    <project>
+        <path>$WS_DIR$\Projects\8_0\8_0.ewp</path>
+    </project>
+    <project>
+        <path>$WS_DIR$\Projects\9_0\9_0.ewp</path>
+    </project>
+    <project>
         <path>$WS_DIR$\Projects\Blinky\Blinky.ewp</path>
+    </project>
+    <project>
+        <path>$WS_DIR$\Projects\pendulum\pendulum.ewp</path>
     </project>
     <project>
         <path>$WS_DIR$\Projects\Timer\Timer.ewp</path>
