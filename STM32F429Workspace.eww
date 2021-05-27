@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <workspace>
     <project>
+        <path>$WS_DIR$\Projects\DigitalGuitar\DigitalGuitar.ewp</path>
+    </project>
+    <project>
+        <path>$WS_DIR$\Projects\OneNote\OneNote.ewp</path>
+    </project>
+    <project>
         <path>$WS_DIR$\Projects\PCMPlay\PCMPlay.ewp</path>
     </project>
     <batchBuild />

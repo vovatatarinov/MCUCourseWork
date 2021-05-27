@@ -1,0 +1,147 @@
+#include "stdlib.h"
+#include "math.h"
+#include "stm32f429xx.h"
+#include "stm32f4xx_ll_bus.h"
+#include "stm32f4xx_ll_gpio.h"
+#include "stm32f4xx_ll_tim.h"
+#include "stm32f4xx_ll_dac.h"
+#include "stm32f4xx_ll_rng.h"
+#include "shurik.h"
+
+#define SAMPLE_RATE 8000
+
+//Частота дискретизации будет равна 8000 Гц
+//Двойной буфер для воспроизведения.
+//В начале программы должно сгенерироваться содержимое для двух буферов.
+//Длину буфера возьмем равной 250 семлам
+//Длительность звучания одного буфера будет равна 31.25 мс
+//В одной секунде будет 32 целых буфера
+//В случае конца воспроизведения буфер, в который идет запись значений должен заполниться нулями до его конца
+
+typedef struct {
+  char* values;
+  int size;
+} signal;
+
+static unsigned char buf[2][250];
+static int activeBuf;
+//static int played;
+static int pcm_it = 0;
+//static signal notesSig[16];
+
+double* generateNoise(int size) {
+  //Сгенерировать шум от -1 до 1 в double
+  double* noise = (double*)malloc(size*sizeof(double));
+  for (int i = 0; i < size; ++i)
+    noise[i] = 2 * (((double)rand() / RAND_MAX) - 0.5);
+  return noise;
+  
+}
+
+void normalizeSignal(signal input) {
+    if (input.size == 0)
+        return;
+    char max;
+    max = labs(input.values[0]);
+    for (int i = 0; i < input.size; ++i) {
+      if (labs(input.values[i]) > max)
+          max = labs(input.values[i]);
+    }
+    if (max != 0) {
+      double k = 127. / (double)max;
+      for (int i = 0; i < input.size; ++i) {
+        input.values[i] = (char)((double)input.values[i] * k);
+      }
+    }
+}
+
+signal getSignal(double frequency_dbl, double duration_dbl) {
+    int noiseSize = (int)((double)SAMPLE_RATE / frequency_dbl);
+    double* noise = generateNoise(noiseSize);
+    signal res;
+    res.size = (int)(duration_dbl * SAMPLE_RATE);
+    double* s = (double*) malloc(res.size * sizeof(double));
+    res.values = (char*) malloc(res.size);
+    for (int i = 0; i < res.size; ++i)
+      res.values[i] = 0;
+    for (int i = 0; ( (i < noiseSize) || (i < res.size) ); ++i)
+      s[i] = noise[i];
+    for (int i = noiseSize; i < res.size; ++i)
+      //Коэффициент подбирается
+      s[i] = 0.996 * (double)((s[i - noiseSize + 1] + s[i - noiseSize]) / 2.);
+    free(noise);
+    for (int i = 0; i < res.size; ++i)
+      res.values[i] = (char)(s[i] * 127);
+    //normalizeSignal(res);
+    free(s);
+    return res;
+}
+
+void playSignal(signal input) {
+  for (int i = 0; i <= input.size / 250; ++i) {
+    int nonActiveBuf = 0;
+    if (activeBuf == 0)
+        nonActiveBuf = 1;
+    if ( (pcm_it >= 0) && (pcm_it < 125) ){
+    for (int j = 0; j < 250; ++j) {
+      int k = i * 250 + j;
+      if (k < input.size)
+        buf[nonActiveBuf][j] = (unsigned char)(((long)input.values[k] + 128));
+        //buf[nonActiveBuf][j] = input.values[k];
+      else
+        buf[nonActiveBuf][j] = 0;
+      //played = 0;
+    }
+     while(pcm_it != 0);
+    }
+    
+  }
+
+}
+
+void TIM1_UP_TIM10_IRQHandler() {
+  LL_TIM_ClearFlag_UPDATE(TIM1);
+  LL_DAC_ConvertData12RightAligned(DAC1, LL_DAC_CHANNEL_1, (long)buf[activeBuf][pcm_it] * 768 / 256);
+  ++pcm_it;
+  if (pcm_it >= 250) {
+    //played = 1;
+    pcm_it = 0;
+    if (activeBuf == 0)
+      activeBuf = 1;
+    else
+      activeBuf = 0;
+  }
+}
+static signal Anote;
+int main() {
+
+  //played = 0;
+  activeBuf = 0;
+  for (int i = 0; i < 2; ++i)
+    for (int j = 0; j < 250; ++j)
+      buf[i][j] = 0;
+  
+  LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOA);
+  LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_DAC1);
+  LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_TIM1);
+  LL_GPIO_SetPinMode(GPIOA, LL_GPIO_PIN_4,  LL_GPIO_MODE_ANALOG);
+  LL_TIM_SetPrescaler(TIM1, 0);
+  LL_TIM_SetCounterMode(TIM1, LL_TIM_COUNTERMODE_UP);
+  LL_TIM_SetAutoReload(TIM1, 1999);
+  LL_TIM_EnableUpdateEvent(TIM1);
+  LL_TIM_EnableIT_UPDATE(TIM1);
+  LL_TIM_EnableCounter(TIM1);
+  LL_DAC_Enable(DAC1, LL_DAC_CHANNEL_1);
+  //Найдем зерно для srand
+  //LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_RNG); //RNG settings
+  //LL_RNG_Enable(RNG);
+  //while(LL_RNG_IsActiveFlag_DRDY(RNG)==0);
+  //seed = LL_RNG_ReadRandData32(RNG);
+  srand(0x55aaff00);
+  
+  Anote = getSignal(330, 1);
+  NVIC_EnableIRQ(TIM1_UP_TIM10_IRQn);
+  while(1) {
+    playSignal(Anote);
+  }
+}
