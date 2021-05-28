@@ -11,7 +11,7 @@
 #define true            0x1
 #define false           0x0
 
-#define SAMPLE_RATE 8000
+#define SAMPLE_RATE 16000
 #define A_FREQ 440.0
 
 //Частота дискретизации будет равна 8000 Гц
@@ -27,7 +27,7 @@ typedef struct {
   int size;
 } signal;
 
-static uint8_t buf[2][250];
+static uint8_t buf[2][8];
 static int activeBuf;
 //static int played;
 static int pcm_it = 0;
@@ -36,6 +36,8 @@ static int flags[16] = { 0 };
 static int notes[16] = { 0 };
 static int time[16] = { 0 };
 static int t = 0;
+//static int ticks = 0;
+//static int millis = 0;
 
 float note2Hz(int note, float freq_of_main_tone) {
     note -= 69;
@@ -50,15 +52,15 @@ int isDelay(uint8_t b) {
 }
 
 
-float* generateNoise(int size) {
+int* generateNoise(int size) {
   //Сгенерировать шум от -1 до 1 в float
-  float* noise = (float*)malloc(size*sizeof(float));
+  int* noise = (int*)malloc(size*sizeof(int));
   for (int i = 0; i < size; ++i)
-    noise[i] = 2*(((float)rand() / RAND_MAX) - 0.5);
+    noise[i] = ((uint32_t)rand() * (0xffffffffUL / (uint32_t)RAND_MAX) );
   return noise;
   
 }
-
+/*
 void normalizeSignal(signal input) {
     if (input.size == 0)
         return;
@@ -75,13 +77,13 @@ void normalizeSignal(signal input) {
       }
     }
 }
-
+*/
 signal getSignal(float frequency_dbl, float duration_dbl) {
     int noiseSize = (int)((float)SAMPLE_RATE / frequency_dbl);
-    float* noise = generateNoise(noiseSize);
+    int* noise = generateNoise(noiseSize);
     signal res;
     res.size = (int)(duration_dbl * SAMPLE_RATE);
-    float* s = (float*) malloc(res.size * sizeof(float));
+    int* s = (int*) malloc(res.size * sizeof(int));
     res.values = (int8_t*) malloc(res.size);
     for (int i = 0; i < res.size; ++i)
       res.values[i] = 0;
@@ -89,15 +91,16 @@ signal getSignal(float frequency_dbl, float duration_dbl) {
       s[i] = noise[i];
     for (int i = noiseSize; i < res.size; ++i)
       //Коэффициент подбирается
-      s[i] = 0.996 * (float)((s[i - noiseSize + 1] + s[i - noiseSize]) / 2.);
+      //s[i] = 0.996 * (float)((s[i - noiseSize + 1] + s[i - noiseSize]) / 2);
+      s[i] = (int)((s[i - noiseSize + 1] + s[i - noiseSize]) / 2);
     free(noise);
     for (int i = 0; i < res.size; ++i)
-      res.values[i] = (int8_t)(s[i] * 127);
+      res.values[i] = (int8_t)(s[i] >> 24);
     //normalizeSignal(res);
     free(s);
     return res;
 }
-
+/*
 signal sineSignal(float frequency_dbl, float duration_dbl) {
   signal res;
   res.size = (int)(duration_dbl * SAMPLE_RATE);
@@ -107,15 +110,15 @@ signal sineSignal(float frequency_dbl, float duration_dbl) {
   }
   return res;
 }
-
+*/
 void playSignal(signal input) {
-  for (int i = 0; i <= input.size / 250; ++i) {
+  for (int i = 0; i <= input.size / sizeof(buf[0]); ++i) {
     int nonActiveBuf = 0;
     if (activeBuf == 0)
         nonActiveBuf = 1;
-    if ( (pcm_it >= 0) && (pcm_it < 125) ){
-    for (int j = 0; j < 250; ++j) {
-      int k = i * 250 + j;
+    if ( (pcm_it >= 0) && (pcm_it < sizeof(buf[0])/2) ){
+    for (int j = 0; j < sizeof(buf[0]); ++j) {
+      int k = i * sizeof(buf[0]) + j;
       if (k < input.size)
         buf[nonActiveBuf][j] = (uint8_t)(((long)input.values[k] + 128));
         //buf[nonActiveBuf][j] = input.values[k];
@@ -123,7 +126,8 @@ void playSignal(signal input) {
         buf[nonActiveBuf][j] = 128;
       //played = 0;
     }
-     while(pcm_it != 0);
+    
+     while(nonActiveBuf != activeBuf);
     }
     
   }
@@ -157,6 +161,12 @@ signal getSound(int note, int time, int ms) {
     
 }
 
+void delay(int ms) {
+  int p = 16000 * ms;
+  for (int i = 0; i < p; ++i)
+    asm volatile("nop");
+}
+
 void genSound(int ms) {
     int t_end = t + ms * SAMPLE_RATE  / 1000;
     while (t_end >= t) {
@@ -179,7 +189,8 @@ void genSound(int ms) {
             res.size = signal_byte[i].size;
           }
         }
-        float* s = malloc(res.size * sizeof(float));
+        //res.size = (int64_t)ms * (int64_t)SAMPLE_RATE / 1000;
+        int* s = malloc(res.size * sizeof(int));
         for (int i = 0; i < res.size; ++i)
           s[i] = 0;
         for (int i = 0; i < 16; ++i) {
@@ -189,7 +200,7 @@ void genSound(int ms) {
           }
         }
         for (int i = 0; i < res.size; ++i) {
-          s[i] /= 2;
+          s[i] /= 4;
         }
         res.values = malloc(res.size);
         for (int i = 0; i < res.size; ++i) {
@@ -204,6 +215,9 @@ void genSound(int ms) {
         playSignal(res);
         res.size = 0;
         free(res.values);
+        
+        //ms -= res.size * 1000/ SAMPLE_RATE;
+        
         /*
         signal_byte /= 16;
         signal_dbl *= 127;
@@ -218,8 +232,9 @@ void genSound(int ms) {
 void TIM1_UP_TIM10_IRQHandler() {
   LL_TIM_ClearFlag_UPDATE(TIM1);
   LL_DAC_ConvertData12RightAligned(DAC1, LL_DAC_CHANNEL_1, (long)buf[activeBuf][pcm_it] * 4096 / 256);
+  //LL_DAC_ConvertData12RightAligned(DAC1, LL_DAC_CHANNEL_1, (long)buf[activeBuf][pcm_it] * 768 / 256);
   ++pcm_it;
-  if (pcm_it >= 250) {
+  if (pcm_it >= sizeof(buf[0])) {
     //played = 1;
     pcm_it = 0;
     if (activeBuf == 0)
@@ -234,7 +249,7 @@ int main() {
   //played = 0;
   activeBuf = 0;
   for (int i = 0; i < 2; ++i)
-    for (int j = 0; j < 250; ++j)
+    for (int j = 0; j < sizeof(buf[0]); ++j)
       buf[i][j] = 0;
   
   LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOA);
@@ -243,7 +258,7 @@ int main() {
   LL_GPIO_SetPinMode(GPIOA, LL_GPIO_PIN_4,  LL_GPIO_MODE_ANALOG);
   LL_TIM_SetPrescaler(TIM1, 0);
   LL_TIM_SetCounterMode(TIM1, LL_TIM_COUNTERMODE_UP);
-  LL_TIM_SetAutoReload(TIM1, 1999);
+  LL_TIM_SetAutoReload(TIM1, 16000000 / SAMPLE_RATE - 1);
   LL_TIM_EnableUpdateEvent(TIM1);
   LL_TIM_EnableIT_UPDATE(TIM1);
   LL_TIM_EnableCounter(TIM1);

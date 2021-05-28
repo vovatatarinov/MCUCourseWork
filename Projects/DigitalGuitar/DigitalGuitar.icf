@@ -35,7 +35,7 @@ define symbol __ICFEDIT_region_SDR1_end__    = 0x0;
 define symbol __ICFEDIT_region_SDR2_start__  = 0x0;
 define symbol __ICFEDIT_region_SDR2_end__    = 0x0;
 /*-Sizes-*/
-define symbol __ICFEDIT_size_cstack__ = 0x2000;
+define symbol __ICFEDIT_size_cstack__ = 0x8000;
 define symbol __ICFEDIT_size_heap__   = 0x1bfff;
 /**** End of ICF editor section. ###ICF###*/
 
